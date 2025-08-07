@@ -1,4 +1,3 @@
-javascript
 exports.handler = async (event, context) => {
   const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
   const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID;
