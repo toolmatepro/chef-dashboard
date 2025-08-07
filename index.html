@@ -628,10 +628,43 @@ html
             updateTable();
         }
 
-        function refreshData() {
-            // Här kommer senare Airtable-anslutningen
-            alert('📊 Data uppdaterad! (kommer snart att hämta från Airtable)');
+       javascript
+async function refreshData() {
+    try {
+        const response = await fetch('/.netlify/functions/airtable');
+        const data = await response.json();
+       
+        if (data.records) {
+            // Konvertera Airtable-data till vårt format
+            allOfferter = data.records.map(record => ({
+                prioritet: record.fields.Prioritet || '🟢 LUGNT',
+                kund: record.fields.Kund || '',
+                projekt: record.fields.Projekt || '',
+                varde: record.fields.Värde || 0,
+                dagar: record.fields.Dagar_Ute || 0,
+                status: record.fields.Status || '',
+                kontakt: record.fields.Kontakt || '',
+                telefon: record.fields.Telefon || ''
+            }));
+           
             loadDashboard();
+            alert('✅ Data uppdaterad från Airtable!');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Kunde inte hämta data. Använder testdata.');
+    }
+}
+
+// Hämta data när sidan laddas
+window.addEventListener('load', function() {
+    const loggedIn = sessionStorage.getItem('loggedIn');
+    if (loggedIn === 'true') {
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('dashboard').style.display = 'block';
+        refreshData(); // Hämta riktig data
+    }
+});
         }
 
         // Auto-logout efter 8 timmar
