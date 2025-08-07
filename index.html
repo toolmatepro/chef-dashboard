@@ -397,6 +397,7 @@ html
     <script>
         // Lösenordshantering
         const DEFAULT_PASSWORD = '12345';
+        localStorage.removeItem('passwordHash');
         let currentPasswordHash = localStorage.getItem('passwordHash');
         let mustChangePassword = false;
 
