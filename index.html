@@ -431,7 +431,8 @@
                     alert('⚠️ Du använder standardlösenordet! Du MÅSTE byta lösenord nu för säkerhets skull.');
                     showChangePassword();
                 }
-               
+
+                await refreshData();
                 loadDashboard();
             } else {
                 errorMsg.style.display = 'block';
