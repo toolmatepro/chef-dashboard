@@ -1,0 +1,664 @@
+html
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BraBygg Chef Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+       
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+       
+        /* Login Screen */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+       
+        .login-box {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 400px;
+        }
+       
+        .login-title {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 24px;
+        }
+       
+        .login-input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+       
+        .login-button {
+            width: 100%;
+            padding: 12px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+       
+        .login-button:hover {
+            background: #5a67d8;
+        }
+       
+        .error-message {
+            color: #e53e3e;
+            text-align: center;
+            margin-top: 10px;
+            display: none;
+        }
+       
+        /* Dashboard */
+        .dashboard {
+            display: none;
+            background: white;
+            min-height: 100vh;
+        }
+       
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+       
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+       
+        .header h1 {
+            font-size: 28px;
+        }
+       
+        .header-buttons {
+            display: flex;
+            gap: 10px;
+        }
+       
+        .btn {
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+       
+        .btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+       
+        .summary-cards {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+       
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+       
+        .card-title {
+            font-size: 14px;
+            color: #718096;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+       
+        .card-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #2d3748;
+        }
+       
+        .card-subtitle {
+            font-size: 14px;
+            color: #a0aec0;
+            margin-top: 5px;
+        }
+       
+        .table-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+       
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+       
+        .table-title {
+            font-size: 24px;
+            color: #2d3748;
+        }
+       
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+        }
+       
+        .filter-btn {
+            padding: 8px 16px;
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+       
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
+        }
+       
+        table {
+            width: 100%;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+       
+        th {
+            background: #f7fafc;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #4a5568;
+            border-bottom: 2px solid #e2e8f0;
+        }
+       
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+       
+        tr:hover {
+            background: #f7fafc;
+        }
+       
+        .priority-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 12px;
+        }
+       
+        .priority-akut {
+            background: #fed7d7;
+            color: #c53030;
+        }
+       
+        .priority-koll {
+            background: #feebc8;
+            color: #c05621;
+        }
+       
+        .priority-lugnt {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+       
+        /* Change Password Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+       
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px;
+        }
+       
+        .modal-title {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: #2d3748;
+        }
+       
+        .modal-input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #e2e8f0;
+            border-radius: 5px;
+        }
+       
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+       
+        .modal-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+       
+        .modal-btn-primary {
+            background: #667eea;
+            color: white;
+        }
+       
+        .modal-btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div class="login-container" id="loginScreen">
+        <div class="login-box">
+            <h2 class="login-title">🔐 BraBygg Chef Dashboard</h2>
+            <input type="text" class="login-input" id="username" placeholder="Användarnamn" value="admin">
+            <input type="password" class="login-input" id="password" placeholder="Lösenord">
+            <button class="login-button" onclick="login()">Logga in</button>
+            <div class="error-message" id="errorMessage">Fel användarnamn eller lösenord</div>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div class="dashboard" id="dashboard">
+        <div class="header">
+            <div class="header-content">
+                <h1>📊 Pipeline Kontroll</h1>
+                <div class="header-buttons">
+                    <button class="btn" onclick="showChangePassword()">Byt lösenord</button>
+                    <button class="btn" onclick="refreshData()">🔄 Uppdatera</button>
+                    <button class="btn" onclick="logout()">Logga ut</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="summary-cards">
+            <div class="card">
+                <div class="card-title">Totalt värde</div>
+                <div class="card-value" id="totalValue">0 SEK</div>
+                <div class="card-subtitle">Aktiva offerter</div>
+            </div>
+            <div class="card">
+                <div class="card-title">Akuta</div>
+                <div class="card-value" id="urgentCount" style="color: #c53030;">0</div>
+                <div class="card-subtitle">Behöver uppföljning NU</div>
+            </div>
+            <div class="card">
+                <div class="card-title">Väntar svar</div>
+                <div class="card-value" id="waitingCount">0</div>
+                <div class="card-subtitle">Totalt antal</div>
+            </div>
+            <div class="card">
+                <div class="card-title">Denna vecka</div>
+                <div class="card-value" id="weekCount">0</div>
+                <div class="card-subtitle">Nya offerter</div>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <div class="table-header">
+                <h2 class="table-title">Aktiva offerter</h2>
+                <div class="filter-buttons">
+                    <button class="filter-btn active" onclick="filterOfferter('all')">Alla</button>
+                    <button class="filter-btn" onclick="filterOfferter('urgent')">🔴 Akuta</button>
+                    <button class="filter-btn" onclick="filterOfferter('warning')">🟡 Varning</button>
+                    <button class="filter-btn" onclick="filterOfferter('ok')">🟢 OK</button>
+                </div>
+            </div>
+           
+            <table>
+                <thead>
+                    <tr>
+                        <th>Prioritet</th>
+                        <th>Kund</th>
+                        <th>Projekt</th>
+                        <th>Värde</th>
+                        <th>Dagar ute</th>
+                        <th>Status</th>
+                        <th>Kontakt</th>
+                    </tr>
+                </thead>
+                <tbody id="offertTable">
+                    <!-- Data fylls i här -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Change Password Modal -->
+    <div class="modal" id="passwordModal">
+        <div class="modal-content">
+            <h3 class="modal-title">Byt lösenord</h3>
+            <input type="password" class="modal-input" id="currentPassword" placeholder="Nuvarande lösenord">
+            <input type="password" class="modal-input" id="newPassword" placeholder="Nytt lösenord (minst 8 tecken)">
+            <input type="password" class="modal-input" id="confirmPassword" placeholder="Bekräfta nytt lösenord">
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-secondary" onclick="closePasswordModal()">Avbryt</button>
+                <button class="modal-btn modal-btn-primary" onclick="changePassword()">Byt lösenord</button>
+            </div>
+            <div class="error-message" id="passwordError" style="display: none; margin-top: 10px;"></div>
+        </div>
+    </div>
+
+    <script>
+        // Lösenordshantering
+        const DEFAULT_PASSWORD = '12345';
+        let currentPasswordHash = localStorage.getItem('passwordHash');
+        let mustChangePassword = false;
+
+        // Om inget lösenord är satt, använd standardlösenordet
+        if (!currentPasswordHash) {
+            currentPasswordHash = btoa(DEFAULT_PASSWORD); // Enkel encoding
+            mustChangePassword = true;
+        }
+
+        // Test data
+        const testData = [
+            {
+                prioritet: "🔴 AKUT",
+                kund: "Villa Andersson",
+                projekt: "Takläggning",
+                varde: 185000,
+                dagar: 19,
+                status: "Väntar svar",
+                kontakt: "andersson@test.se",
+                telefon: "070-123 45 67"
+            },
+            {
+                prioritet: "🟡 HÅLL KOLL",
+                kund: "Företag AB",
+                projekt: "Köksrenovering",
+                varde: 95000,
+                dagar: 13,
+                status: "Väntar svar",
+                kontakt: "foretag@test.se",
+                telefon: "070-234 56 78"
+            },
+            {
+                prioritet: "🟢 LUGNT",
+                kund: "Garage Fix",
+                projekt: "Snickeri",
+                varde: 45000,
+                dagar: 4,
+                status: "Väntar svar",
+                kontakt: "garage@test.se",
+                telefon: "070-345 67 89"
+            },
+            {
+                prioritet: "🟡 HÅLL KOLL",
+                kund: "Villa Karlsson",
+                projekt: "Altanbygge",
+                varde: 125000,
+                dagar: 10,
+                status: "Godkänd",
+                kontakt: "karlsson@test.se",
+                telefon: "070-456 78 90"
+            },
+            {
+                prioritet: "🟢 LUGNT",
+                kund: "Hus & Hem",
+                projekt: "Badrumsrenovering",
+                varde: 78000,
+                dagar: 2,
+                status: "Skickad",
+                kontakt: "hushem@test.se",
+                telefon: "070-567 89 01"
+            }
+        ];
+
+        let currentFilter = 'all';
+        let allOfferter = testData;
+
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const errorMsg = document.getElementById('errorMessage');
+           
+            if (username !== 'admin') {
+                errorMsg.style.display = 'block';
+                errorMsg.textContent = 'Användarnamnet måste vara "admin"';
+                return;
+            }
+           
+            const passwordHash = btoa(password);
+           
+            if (passwordHash === currentPasswordHash) {
+                sessionStorage.setItem('loggedIn', 'true');
+                sessionStorage.setItem('loginTime', Date.now());
+               
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'block';
+               
+                // Tvinga lösenordsbyte om standard
+                if (mustChangePassword && password === DEFAULT_PASSWORD) {
+                    alert('⚠️ Du använder standardlösenordet! Du MÅSTE byta lösenord nu för säkerhets skull.');
+                    showChangePassword();
+                }
+               
+                loadDashboard();
+            } else {
+                errorMsg.style.display = 'block';
+                errorMsg.textContent = 'Fel lösenord';
+            }
+        }
+
+        function showChangePassword() {
+            document.getElementById('passwordModal').style.display = 'flex';
+        }
+
+        function closePasswordModal() {
+            if (mustChangePassword) {
+                alert('Du måste byta lösenord innan du kan fortsätta!');
+                return;
+            }
+            document.getElementById('passwordModal').style.display = 'none';
+            document.getElementById('currentPassword').value = '';
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmPassword').value = '';
+            document.getElementById('passwordError').style.display = 'none';
+        }
+
+        function changePassword() {
+            const current = document.getElementById('currentPassword').value;
+            const newPass = document.getElementById('newPassword').value;
+            const confirm = document.getElementById('confirmPassword').value;
+            const errorDiv = document.getElementById('passwordError');
+           
+            // Verifiera nuvarande lösenord
+            if (btoa(current) !== currentPasswordHash) {
+                errorDiv.textContent = 'Fel nuvarande lösenord';
+                errorDiv.style.display = 'block';
+                return;
+            }
+           
+            // Validera nytt lösenord
+            if (newPass.length < 8) {
+                errorDiv.textContent = 'Lösenordet måste vara minst 8 tecken';
+                errorDiv.style.display = 'block';
+                return;
+            }
+           
+            if (newPass !== confirm) {
+                errorDiv.textContent = 'Lösenorden matchar inte';
+                errorDiv.style.display = 'block';
+                return;
+            }
+           
+            if (newPass === DEFAULT_PASSWORD) {
+                errorDiv.textContent = 'Du kan inte använda standardlösenordet';
+                errorDiv.style.display = 'block';
+                return;
+            }
+           
+            // Spara nytt lösenord
+            currentPasswordHash = btoa(newPass);
+            localStorage.setItem('passwordHash', currentPasswordHash);
+            mustChangePassword = false;
+           
+            alert('✅ Lösenordet har bytts!');
+            closePasswordModal();
+        }
+
+        function logout() {
+            sessionStorage.removeItem('loggedIn');
+            sessionStorage.removeItem('loginTime');
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('password').value = '';
+        }
+
+        function loadDashboard() {
+            updateSummaryCards();
+            updateTable();
+        }
+
+        function updateSummaryCards() {
+            const activeOfferter = allOfferter.filter(o => o.status === 'Väntar svar' || o.status === 'Skickad');
+            const totalValue = activeOfferter.reduce((sum, o) => sum + o.varde, 0);
+            const urgentCount = allOfferter.filter(o => o.prioritet.includes('AKUT')).length;
+            const waitingCount = allOfferter.filter(o => o.status === 'Väntar svar').length;
+           
+            document.getElementById('totalValue').textContent = totalValue.toLocaleString('sv-SE') + ' SEK';
+            document.getElementById('urgentCount').textContent = urgentCount;
+            document.getElementById('waitingCount').textContent = waitingCount;
+            document.getElementById('weekCount').textContent = allOfferter.filter(o => o.dagar <= 7).length;
+        }
+
+        function updateTable() {
+            const tbody = document.getElementById('offertTable');
+            let filteredData = allOfferter;
+           
+            if (currentFilter === 'urgent') {
+                filteredData = allOfferter.filter(o => o.prioritet.includes('AKUT'));
+            } else if (currentFilter === 'warning') {
+                filteredData = allOfferter.filter(o => o.prioritet.includes('HÅLL KOLL'));
+            } else if (currentFilter === 'ok') {
+                filteredData = allOfferter.filter(o => o.prioritet.includes('LUGNT'));
+            }
+           
+            tbody.innerHTML = filteredData.map(offert => `
+                <tr>
+                    <td>
+                        <span class="priority-badge ${getPriorityClass(offert.prioritet)}">
+                            ${offert.prioritet}
+                        </span>
+                    </td>
+                    <td><strong>${offert.kund}</strong></td>
+                    <td>${offert.projekt}</td>
+                    <td>${offert.varde.toLocaleString('sv-SE')} SEK</td>
+                    <td>${offert.dagar} dagar</td>
+                    <td>${offert.status}</td>
+                    <td>
+                        📧 ${offert.kontakt}<br>
+                        📞 ${offert.telefon}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function getPriorityClass(priority) {
+            if (priority.includes('AKUT')) return 'priority-akut';
+            if (priority.includes('HÅLL KOLL')) return 'priority-koll';
+            return 'priority-lugnt';
+        }
+
+        function filterOfferter(filter) {
+            currentFilter = filter;
+           
+            // Uppdatera aktiv knapp
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+           
+            updateTable();
+        }
+
+        function refreshData() {
+            // Här kommer senare Airtable-anslutningen
+            alert('📊 Data uppdaterad! (kommer snart att hämta från Airtable)');
+            loadDashboard();
+        }
+
+        // Auto-logout efter 8 timmar
+        setInterval(() => {
+            const loginTime = sessionStorage.getItem('loginTime');
+            if (loginTime && Date.now() - loginTime > 8 * 60 * 60 * 1000) {
+                alert('Din session har gått ut. Vänligen logga in igen.');
+                logout();
+            }
+        }, 60000); // Kolla varje minut
+
+        // Kolla om användaren redan är inloggad
+        window.onload = function() {
+            const loggedIn = sessionStorage.getItem('loggedIn');
+            if (loggedIn === 'true') {
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'block';
+                loadDashboard();
+            }
+        }
+
+        // Enter-tangent för login
+        document.getElementById('password').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                login();
+            }
+        });
+    </script>
+</body>
+</html>
