@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BraBygg Chef Dashboard</title>
+    <title>Chef Dashboard</title>
     <style>
         * {
             margin: 0;
@@ -304,7 +304,7 @@
     <!-- Login Screen -->
     <div class="login-container" id="loginScreen">
         <div class="login-box">
-            <h2 class="login-title">🔐 BraBygg Chef Dashboard</h2>
+            <h2 class="login-title">🔐 Chef Dashboard</h2>
             <input type="text" class="login-input" id="username" placeholder="Användarnamn" value="admin">
             <input type="password" class="login-input" id="password" placeholder="Lösenord">
             <button class="login-button" onclick="login()">Logga in</button>
@@ -395,70 +395,13 @@
 
     <script>
         // Lösenordshantering
-        const DEFAULT_PASSWORD = '12345';
-        localStorage.removeItem('passwordHash');
-        let currentPasswordHash = localStorage.getItem('passwordHash');
-        let mustChangePassword = false;
+            const DEFAULT_PASSWORD = '12345';
+            let currentPasswordHash = null;
+            let mustChangePassword = true;
 
-        // Om inget lösenord är satt, använd standardlösenordet
-        if (!currentPasswordHash) {
-            currentPasswordHash = btoa(DEFAULT_PASSWORD); // Enkel encoding
-            mustChangePassword = true;
-        }
-
-        // Test data
-        const testData = [
-            {
-                prioritet: "🔴 AKUT",
-                kund: "Villa Andersson",
-                projekt: "Takläggning",
-                varde: 185000,
-                dagar: 19,
-                status: "Väntar svar",
-                kontakt: "andersson@test.se",
-                telefon: "070-123 45 67"
-            },
-            {
-                prioritet: "🟡 HÅLL KOLL",
-                kund: "Företag AB",
-                projekt: "Köksrenovering",
-                varde: 95000,
-                dagar: 13,
-                status: "Väntar svar",
-                kontakt: "foretag@test.se",
-                telefon: "070-234 56 78"
-            },
-            {
-                prioritet: "🟢 LUGNT",
-                kund: "Garage Fix",
-                projekt: "Snickeri",
-                varde: 45000,
-                dagar: 4,
-                status: "Väntar svar",
-                kontakt: "garage@test.se",
-                telefon: "070-345 67 89"
-            },
-            {
-                prioritet: "🟡 HÅLL KOLL",
-                kund: "Villa Karlsson",
-                projekt: "Altanbygge",
-                varde: 125000,
-                dagar: 10,
-                status: "Godkänd",
-                kontakt: "karlsson@test.se",
-                telefon: "070-456 78 90"
-            },
-            {
-                prioritet: "🟢 LUGNT",
-                kund: "Hus & Hem",
-                projekt: "Badrumsrenovering",
-                varde: 78000,
-                dagar: 2,
-                status: "Skickad",
-                kontakt: "hushem@test.se",
-                telefon: "070-567 89 01"
-            }
-        ];
+        // Tvinga att standardlösenordet alltid används
+        currentPasswordHash = btoa(DEFAULT_PASSWORD);
+        localStorage.setItem('passwordHash', currentPasswordHash);
 
         let currentFilter = 'all';
         let allOfferter = testData;
@@ -664,7 +607,6 @@ window.addEventListener('load', function() {
         refreshData(); // Hämta riktig data
     }
 });
-        }
 
         // Auto-logout efter 8 timmar
         setInterval(() => {
@@ -675,15 +617,6 @@ window.addEventListener('load', function() {
             }
         }, 60000); // Kolla varje minut
 
-        // Kolla om användaren redan är inloggad
-        window.onload = function() {
-            const loggedIn = sessionStorage.getItem('loggedIn');
-            if (loggedIn === 'true') {
-                document.getElementById('loginScreen').style.display = 'none';
-                document.getElementById('dashboard').style.display = 'block';
-                loadDashboard();
-            }
-        }
 
         // Enter-tangent för login
         document.getElementById('password').addEventListener('keypress', function(e) {
